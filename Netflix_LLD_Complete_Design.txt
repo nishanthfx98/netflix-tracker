@@ -1,0 +1,628 @@
+================================================================
+NETFLIX MOVIE STREAMING TRACKER - LOW-LEVEL DESIGN (LLD)
+================================================================
+
+3.1 SYSTEM ARCHITECTURE
+================================================================
+
+@startuml
+!theme plain
+
+package "Presentation Layer" {
+    [Web Browser] as browser
+    [Thymeleaf Templates] as templates
+    [Static Resources] as static
+}
+
+package "Controller Layer" {
+    [AuthController] as auth
+    [AdminController] as admin
+    [MovieController] as movie
+    [WatchController] as watch
+    [DashboardController] as dash
+}
+
+package "Service Layer" {
+    [UserService] as userSvc
+    [MovieService] as movieSvc
+    [WatchHistoryService] as watchSvc
+    [RecommendationService] as recSvc
+}
+
+package "Repository Layer" {
+    [UserRepository] as userRepo
+    [MovieRepository] as movieRepo
+    [WatchHistoryRepository] as watchRepo
+}
+
+package "Security Layer" {
+    [Spring Security] as security
+    [UserDetailsServiceImpl] as userDetails
+    [SecurityConfig] as secConfig
+}
+
+package "Database Layer" {
+    database "MySQL Database" {
+        [users] as usersTable
+        [movies] as moviesTable
+        [watch_history] as watchTable
+    }
+}
+
+browser --> templates
+templates --> auth
+templates --> admin
+templates --> movie
+templates --> watch
+templates --> dash
+
+auth --> userSvc
+admin --> movieSvc
+movie --> movieSvc
+watch --> watchSvc
+dash --> movieSvc
+
+userSvc --> userRepo
+movieSvc --> movieRepo
+watchSvc --> watchRepo
+recSvc --> watchSvc
+recSvc --> movieSvc
+
+userRepo --> usersTable
+movieRepo --> moviesTable
+watchRepo --> watchTable
+
+security --> userDetails
+userDetails --> userRepo
+secConfig --> security
+
+@enduml
+
+================================================================
+3.2 COMPONENT DESIGN
+================================================================
+
+@startuml
+!theme plain
+
+component "Netflix Tracker Application" {
+    
+    component "Web Layer" {
+        [Login Page]
+        [Dashboard]
+        [Movie Catalog]
+        [Watch History]
+        [Admin Panel]
+    }
+    
+    component "Controller Components" {
+        [Authentication Controller]
+        [Movie Management Controller]
+        [User Management Controller]
+        [Watch Tracking Controller]
+        [Admin Operations Controller]
+    }
+    
+    component "Business Logic Components" {
+        [User Authentication Service]
+        [Movie Catalog Service]
+        [Recommendation Engine]
+        [Watch History Tracker]
+        [Rating Calculator]
+    }
+    
+    component "Data Access Components" {
+        [User Data Repository]
+        [Movie Data Repository]
+        [Watch History Repository]
+        [JPA Entity Manager]
+    }
+    
+    component "Security Components" {
+        [Spring Security Filter]
+        [Password Encoder]
+        [Session Manager]
+        [Role-based Access Control]
+    }
+    
+    component "External Dependencies" {
+        [MySQL Database]
+        [Spring Boot Framework]
+        [Thymeleaf Template Engine]
+        [Bootstrap CSS Framework]
+    }
+}
+
+[Web Layer] --> [Controller Components]
+[Controller Components] --> [Business Logic Components]
+[Business Logic Components] --> [Data Access Components]
+[Security Components] --> [Controller Components]
+[Data Access Components] --> [External Dependencies]
+
+@enduml
+
+================================================================
+4.1 USE CASE DIAGRAM
+================================================================
+
+@startuml
+!theme plain
+
+left to right direction
+
+actor "Regular User" as user
+actor "Administrator" as admin
+actor "Guest User" as guest
+
+rectangle "Netflix Movie Streaming Tracker System" {
+    
+    ' Guest User Cases
+    usecase "View Home Page" as UC1
+    usecase "Register Account" as UC2
+    usecase "Login to System" as UC3
+    
+    ' Regular User Cases
+    usecase "Browse Movie Catalog" as UC4
+    usecase "Search Movies" as UC5
+    usecase "Watch Movie" as UC6
+    usecase "Rate Movie" as UC7
+    usecase "View Watch History" as UC8
+    usecase "Get Personalized Recommendations" as UC9
+    usecase "Update Profile" as UC10
+    usecase "Logout" as UC11
+    
+    ' Admin User Cases
+    usecase "Add New Movie" as UC12
+    usecase "Edit Movie Details" as UC13
+    usecase "Delete Movie" as UC14
+    usecase "View All Users" as UC15
+    usecase "Manage User Accounts" as UC16
+    usecase "View System Statistics" as UC17
+    usecase "Export Reports" as UC18
+}
+
+' Guest relationships
+guest --> UC1
+guest --> UC2
+guest --> UC3
+
+' User relationships
+user --> UC3
+user --> UC4
+user --> UC5
+user --> UC6
+user --> UC7
+user --> UC8
+user --> UC9
+user --> UC10
+user --> UC11
+
+' Admin relationships (inherits user capabilities)
+admin --> UC3
+admin --> UC4
+admin --> UC5
+admin --> UC12
+admin --> UC13
+admin --> UC14
+admin --> UC15
+admin --> UC16
+admin --> UC17
+admin --> UC18
+
+' Use case extensions and includes
+UC6 ..> UC7 : extends
+UC7 ..> UC8 : includes
+UC9 ..> UC8 : includes
+UC4 ..> UC5 : includes
+
+@enduml
+
+================================================================
+4.2 CLASS DIAGRAM RELATIONSHIPS
+================================================================
+
+@startuml
+!theme plain
+
+' Entity Classes
+class User {
+    -Long userId
+    -String name
+    -String email
+    -String password
+    -String role
+    -String subscriptionType
+    -LocalDateTime joinDate
+}
+
+class Movie {
+    -Long movieId
+    -String title
+    -String genre
+    -Integer releaseYear
+    -Integer duration
+    -Float ratingAvg
+    -String contentType
+    -String imageUrl
+    -String trailerUrl
+}
+
+class WatchHistory {
+    -Long watchId
+    -LocalDateTime watchDate
+    -Integer rating
+}
+
+' Service Classes
+class UserService {
+    +registerUser(): User
+    +authenticateUser(): boolean
+    +getUserByEmail(): User
+}
+
+class MovieService {
+    +getAllMovies(): List<Movie>
+    +getMovieById(): Movie
+    +saveMovie(): Movie
+    +deleteMovie(): void
+}
+
+class WatchHistoryService {
+    +saveWatchHistory(): WatchHistory
+    +getWatchHistoryByUser(): List<WatchHistory>
+}
+
+class RecommendationService {
+    +getRecommendedMovies(): List<Movie>
+}
+
+' Repository Interfaces
+interface UserRepository {
+    +findByEmail(): User
+    +save(): User
+}
+
+interface MovieRepository {
+    +findAll(): List<Movie>
+    +findById(): Movie
+    +findByGenre(): List<Movie>
+}
+
+interface WatchHistoryRepository {
+    +findByUserUserId(): List<WatchHistory>
+    +findByMovieMovieId(): List<WatchHistory>
+}
+
+' Relationships
+User ||--o{ WatchHistory : "1 to many"
+Movie ||--o{ WatchHistory : "1 to many"
+WatchHistory }o--|| User : "many to 1"
+WatchHistory }o--|| Movie : "many to 1"
+
+UserService --> UserRepository : uses
+MovieService --> MovieRepository : uses
+WatchHistoryService --> WatchHistoryRepository : uses
+RecommendationService --> WatchHistoryService : depends on
+RecommendationService --> MovieService : depends on
+
+UserRepository --|> JpaRepository : extends
+MovieRepository --|> JpaRepository : extends
+WatchHistoryRepository --|> JpaRepository : extends
+
+@enduml
+
+================================================================
+5.1 ENTITY RELATIONSHIP DIAGRAM (ERD)
+================================================================
+
+@startuml
+!theme plain
+
+entity "users" {
+    * user_id : BIGINT <<PK>>
+    --
+    * name : VARCHAR(50) <<NOT NULL>>
+    * email : VARCHAR(100) <<UNIQUE, NOT NULL>>
+    * password : VARCHAR(255) <<NOT NULL>>
+    * role : VARCHAR(20) <<NOT NULL, DEFAULT 'USER'>>
+    subscription_type : VARCHAR(30)
+    join_date : DATETIME <<DEFAULT CURRENT_TIMESTAMP>>
+    --
+    Indexes:
+    + idx_email (email)
+    + idx_role (role)
+}
+
+entity "movies" {
+    * movie_id : BIGINT <<PK>>
+    --
+    * title : VARCHAR(100) <<NOT NULL>>
+    genre : VARCHAR(50)
+    release_year : INT
+    duration : INT <<minutes>>
+    rating_avg : FLOAT <<DEFAULT 0.0>>
+    content_type : VARCHAR(30)
+    image_url : VARCHAR(255)
+    trailer_url : VARCHAR(255)
+    created_at : DATETIME <<DEFAULT CURRENT_TIMESTAMP>>
+    --
+    Indexes:
+    + idx_title (title)
+    + idx_genre (genre)
+    + idx_rating (rating_avg)
+    + idx_release_year (release_year)
+}
+
+entity "watch_history" {
+    * watch_id : BIGINT <<PK>>
+    --
+    * user_id : BIGINT <<FK, NOT NULL>>
+    * movie_id : BIGINT <<FK, NOT NULL>>
+    * rating : INT <<NOT NULL, CHECK (rating >= 1 AND rating <= 5)>>
+    watch_date : DATETIME <<DEFAULT CURRENT_TIMESTAMP>>
+    --
+    Indexes:
+    + idx_user_id (user_id)
+    + idx_movie_id (movie_id)
+    + idx_watch_date (watch_date)
+    + idx_rating (rating)
+    --
+    Constraints:
+    + UNIQUE(user_id, movie_id)
+}
+
+users ||--o{ watch_history : "1 user can have many watch records"
+movies ||--o{ watch_history : "1 movie can be watched by many users"
+
+note right of users : "Stores user account information\nwith authentication details"
+note right of movies : "Stores movie/show catalog\nwith metadata and ratings"
+note right of watch_history : "Junction table tracking\nuser viewing and ratings"
+
+@enduml
+
+================================================================
+5.2 DATABASE CONSTRAINTS
+================================================================
+
+@startuml
+!theme plain
+
+class "Database Constraints" {
+    
+    **PRIMARY KEY CONSTRAINTS:**
+    + users.user_id (AUTO_INCREMENT)
+    + movies.movie_id (AUTO_INCREMENT)
+    + watch_history.watch_id (AUTO_INCREMENT)
+    
+    **FOREIGN KEY CONSTRAINTS:**
+    + watch_history.user_id → users.user_id
+      ON DELETE CASCADE ON UPDATE CASCADE
+    + watch_history.movie_id → movies.movie_id
+      ON DELETE CASCADE ON UPDATE CASCADE
+    
+    **UNIQUE CONSTRAINTS:**
+    + users.email (UNIQUE INDEX)
+    + watch_history(user_id, movie_id) (COMPOSITE UNIQUE)
+    
+    **NOT NULL CONSTRAINTS:**
+    + users: name, email, password, role
+    + movies: title
+    + watch_history: user_id, movie_id, rating
+    
+    **CHECK CONSTRAINTS:**
+    + watch_history.rating BETWEEN 1 AND 5
+    + users.role IN ('USER', 'ADMIN')
+    + movies.release_year >= 1900
+    + movies.duration > 0
+    + movies.rating_avg BETWEEN 0.0 AND 5.0
+    
+    **DEFAULT VALUES:**
+    + users.role = 'USER'
+    + users.join_date = CURRENT_TIMESTAMP
+    + movies.rating_avg = 0.0
+    + movies.created_at = CURRENT_TIMESTAMP
+    + watch_history.watch_date = CURRENT_TIMESTAMP
+    
+    **INDEX CONSTRAINTS:**
+    + idx_users_email ON users(email)
+    + idx_users_role ON users(role)
+    + idx_movies_title ON movies(title)
+    + idx_movies_genre ON movies(genre)
+    + idx_movies_rating ON movies(rating_avg DESC)
+    + idx_watch_user ON watch_history(user_id)
+    + idx_watch_movie ON watch_history(movie_id)
+    + idx_watch_date ON watch_history(watch_date DESC)
+}
+
+@enduml
+
+================================================================
+ADDITIONAL DESIGN DIAGRAMS
+================================================================
+
+6.1 SEQUENCE DIAGRAM - USER REGISTRATION
+================================================================
+
+@startuml
+!theme plain
+
+participant "User" as U
+participant "AuthController" as AC
+participant "UserService" as US
+participant "PasswordEncoder" as PE
+participant "UserRepository" as UR
+participant "Database" as DB
+
+U -> AC: POST /register (name, email, password, subscription)
+activate AC
+
+AC -> US: registerUser(name, email, password, subscription)
+activate US
+
+US -> UR: findByEmail(email)
+activate UR
+UR -> DB: SELECT * FROM users WHERE email = ?
+activate DB
+DB --> UR: null (if email not exists)
+deactivate DB
+UR --> US: null
+deactivate UR
+
+US -> PE: encode(password)
+activate PE
+PE --> US: encodedPassword
+deactivate PE
+
+US -> US: createUser(name, email, encodedPassword, subscription)
+US -> UR: save(user)
+activate UR
+UR -> DB: INSERT INTO users VALUES (...)
+activate DB
+DB --> UR: saved user
+deactivate DB
+UR --> US: saved user
+deactivate UR
+
+US --> AC: registered user
+deactivate US
+
+AC --> U: redirect:/login?registered
+deactivate AC
+
+@enduml
+
+================================================================
+6.2 SEQUENCE DIAGRAM - MOVIE RECOMMENDATION
+================================================================
+
+@startuml
+!theme plain
+
+participant "User" as U
+participant "AuthController" as AC
+participant "RecommendationService" as RS
+participant "WatchHistoryService" as WHS
+participant "MovieService" as MS
+participant "Database" as DB
+
+U -> AC: GET /recommendations
+activate AC
+
+AC -> RS: getRecommendedMovies(userId)
+activate RS
+
+RS -> WHS: getWatchHistoryByUser(userId)
+activate WHS
+WHS -> DB: SELECT * FROM watch_history WHERE user_id = ? AND rating >= 4
+activate DB
+DB --> WHS: high-rated watch history
+deactivate DB
+WHS --> RS: List<WatchHistory>
+deactivate WHS
+
+RS -> RS: analyzeGenrePreferences(watchHistory)
+RS -> MS: getAllMovies()
+activate MS
+MS -> DB: SELECT * FROM movies ORDER BY rating_avg DESC
+activate DB
+DB --> MS: all movies
+deactivate DB
+MS --> RS: List<Movie>
+deactivate MS
+
+RS -> RS: filterByGenreAndUnwatched(movies, favoriteGenres, watchedIds)
+RS --> AC: List<Movie> recommendations
+deactivate RS
+
+AC --> U: recommendations.html with movie list
+deactivate AC
+
+@enduml
+
+================================================================
+6.3 ACTIVITY DIAGRAM - WATCH MOVIE FLOW
+================================================================
+
+@startuml
+!theme plain
+
+start
+
+:User clicks on movie;
+:System checks authentication;
+
+if (User authenticated?) then (yes)
+    :Load movie details;
+    :Display watch page;
+    :User watches movie;
+    
+    if (User wants to rate?) then (yes)
+        :Display rating form;
+        :User submits rating (1-5);
+        :Validate rating;
+        
+        if (Rating valid?) then (yes)
+            :Save to watch_history;
+            :Update movie average rating;
+            :Display success message;
+        else (no)
+            :Display error message;
+        endif
+    else (no)
+        :Continue without rating;
+    endif
+    
+    :Update user recommendations;
+    :Return to dashboard;
+else (no)
+    :Redirect to login page;
+endif
+
+stop
+
+@enduml
+
+================================================================
+6.4 STATE DIAGRAM - USER SESSION MANAGEMENT
+================================================================
+
+@startuml
+!theme plain
+
+[*] --> Anonymous : "User visits site"
+
+Anonymous --> Authenticating : "Submit login form"
+Anonymous --> Registering : "Submit registration form"
+
+Registering --> Anonymous : "Registration complete"
+Registering --> Anonymous : "Registration failed"
+
+Authenticating --> Authenticated : "Valid credentials"
+Authenticating --> Anonymous : "Invalid credentials"
+
+Authenticated --> UserDashboard : "Regular user role"
+Authenticated --> AdminDashboard : "Admin user role"
+
+UserDashboard --> Browsing : "Browse movies"
+UserDashboard --> WatchingMovie : "Select movie"
+UserDashboard --> ViewingHistory : "View history"
+UserDashboard --> ViewingRecommendations : "View recommendations"
+
+Browsing --> WatchingMovie : "Select movie"
+WatchingMovie --> Rating : "Rate movie"
+Rating --> UserDashboard : "Rating submitted"
+
+AdminDashboard --> ManagingMovies : "Manage movies"
+AdminDashboard --> ManagingUsers : "Manage users"
+ManagingMovies --> AdminDashboard : "Operations complete"
+ManagingUsers --> AdminDashboard : "Operations complete"
+
+UserDashboard --> [*] : "Logout"
+AdminDashboard --> [*] : "Logout"
+Authenticated --> [*] : "Session timeout"
+
+@enduml
+
+================================================================
+END OF LOW-LEVEL DESIGN DOCUMENT
+================================================================

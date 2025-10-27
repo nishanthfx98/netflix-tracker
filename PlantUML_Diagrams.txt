@@ -1,0 +1,762 @@
+NETFLIX MOVIE STREAMING TRACKER - PLANTUML DIAGRAMS
+================================================================
+
+Copy and paste these codes into https://plantuml.com/plantuml to generate UML diagrams
+
+================================================================
+1. CLASS DIAGRAM
+================================================================
+
+@startuml
+!theme plain
+
+class User {
+    -Long userId
+    -String name
+    -String email
+    -String password
+    -String subscriptionType
+    -LocalDateTime joinDate
+    -String role
+    +getUserId(): Long
+    +getName(): String
+    +getEmail(): String
+    +setPassword(String): void
+    +getRole(): String
+}
+
+class Movie {
+    -Long movieId
+    -String title
+    -String genre
+    -Integer releaseYear
+    -Integer duration
+    -Float ratingAvg
+    -String contentType
+    -String imageUrl
+    -String trailerUrl
+    -LocalDateTime createdAt
+    +getMovieId(): Long
+    +getTitle(): String
+    +getGenre(): String
+    +getRatingAvg(): Float
+}
+
+class WatchHistory {
+    -Long watchId
+    -User user
+    -Movie movie
+    -LocalDateTime watchDate
+    -Integer rating
+    +getWatchId(): Long
+    +getUser(): User
+    +getMovie(): Movie
+    +getRating(): Integer
+}
+
+class AuthController {
+    -UserService userService
+    +login(): String
+    +register(): String
+    +logout(): String
+}
+
+class MovieController {
+    -MovieService movieService
+    +getAllMovies(): List<Movie>
+    +getMovieById(Long): Movie
+    +searchMovies(String): List<Movie>
+}
+
+class UserController {
+    -UserService userService
+    +getUserProfile(): User
+    +updateProfile(): String
+}
+
+class WatchHistoryController {
+    -WatchHistoryService watchHistoryService
+    +addWatchHistory(): String
+    +getWatchHistory(): List<WatchHistory>
+}
+
+class AdminController {
+    -M@startuml
+!theme plain
+
+' ===============================
+' ENTITY/MODEL CLASSES
+' ===============================
+
+class User {
+    -Long userId
+    -String name
+    -String email
+    -String subscriptionType
+    -LocalDateTime joinDate
+    -String password
+    -String role
+    --
+    +User()
+    +User(String, String, String, String, String)
+    +getUserId(): Long
+    +setUserId(Long): void
+    +getName(): String
+    +setName(String): void
+    +getEmail(): String
+    +setEmail(String): void
+    +getSubscriptionType(): String
+    +setSubscriptionType(String): void
+    +getJoinDate(): LocalDateTime
+    +setJoinDate(LocalDateTime): void
+    +getPassword(): String
+    +setPassword(String): void
+    +getRole(): String
+    +setRole(String): void
+}
+
+class Movie {
+    -Long movieId
+    -String title
+    -String genre
+    -Integer releaseYear
+    -Integer duration
+    -Float ratingAvg
+    -String contentType
+    -LocalDateTime createdAt
+    -String imageUrl
+    -String trailerUrl
+    --
+    +Movie()
+    +Movie(String, String, Integer, Integer, String)
+    +getMovieId(): Long
+    +setMovieId(Long): void
+    +getTitle(): String
+    +setTitle(String): void
+    +getGenre(): String
+    +setGenre(String): void
+    +getReleaseYear(): Integer
+    +setReleaseYear(Integer): void
+    +getDuration(): Integer
+    +setDuration(Integer): void
+    +getRatingAvg(): Float
+    +setRatingAvg(Float): void
+    +getContentType(): String
+    +setContentType(String): void
+    +getCreatedAt(): LocalDateTime
+    +setCreatedAt(LocalDateTime): void
+    +getImageUrl(): String
+    +setImageUrl(String): void
+    +getTrailerUrl(): String
+    +setTrailerUrl(String): void
+}
+
+class WatchHistory {
+    -Long watchId
+    -User user
+    -Movie movie
+    -LocalDateTime watchDate
+    -Integer rating
+    --
+    +WatchHistory()
+    +WatchHistory(User, Movie, Integer)
+    +getWatchId(): Long
+    +setWatchId(Long): void
+    +getUser(): User
+    +setUser(User): void
+    +getMovie(): Movie
+    +setMovie(Movie): void
+    +getWatchDate(): LocalDateTime
+    +setWatchDate(LocalDateTime): void
+    +getRating(): Integer
+    +setRating(Integer): void
+}
+
+' ===============================
+' CONTROLLER CLASSES
+' ===============================
+
+class AuthController {
+    -UserService userService
+    -WatchHistoryService watchHistoryService
+    -RecommendationService recommendationService
+    --
+    +home(): String
+    +login(): String
+    +register(): String
+    +registerUser(String, String, String, String): String
+    +dashboard(): String
+    +myHistory(Model, Authentication): String
+    +recommendations(Model, Authentication): String
+}
+
+class AdminController {
+    -MovieService movieService
+    --
+    +manageMovies(Model): String
+    +addMovieForm(): String
+    +addMovie(String, String, Integer, Integer, String): String
+    +editMovieForm(Long, Model): String
+    +updateMovie(Long, String, String, Integer, Integer, String, Float): String
+    +deleteMovie(Long): String
+}
+
+class MovieController {
+    -MovieService movieService
+    --
+    +getAllMovies(): List<Movie>
+    +getMovieById(Long): Movie
+}
+
+class UserController {
+    -UserService userService
+    --
+    +getAllUsers(): List<User>
+    +getUserById(Long): User
+}
+
+class WatchHistoryController {
+    -WatchHistoryService watchHistoryService
+    --
+    +saveWatchHistory(WatchHistory): WatchHistory
+    +getWatchHistoryByUser(Long): List<WatchHistory>
+}
+
+class DashboardController {
+    -MovieService movieService
+    -WatchHistoryService watchHistoryService
+    --
+    +dashboard(Model): String
+}
+
+class WatchController {
+    -MovieService movieService
+    -UserService userService
+    -WatchHistoryService watchHistoryService
+    --
+    +watchMovie(Long, Model, Authentication): String
+    +rateMovie(Long, Integer, Authentication): String
+}
+
+' ===============================
+' SERVICE CLASSES
+' ===============================
+
+class UserService {
+    -UserRepository userRepository
+    -PasswordEncoder passwordEncoder
+    --
+    +saveUser(User): User
+    +registerUser(String, String, String, String): User
+    +existsByEmail(String): boolean
+    +getAllUsers(): List<User>
+    +getUserById(Long): User
+    +getUserByEmail(String): User
+}
+
+class MovieService {
+    -MovieRepository movieRepository
+    -WatchHistoryRepository watchHistoryRepository
+    --
+    +saveMovie(Movie): Movie
+    +getAllMovies(): List<Movie>
+    +getMovieById(Long): Movie
+    +getTopRatedMovies(): List<Movie>
+    +updateMovieRating(Long): void
+    +deleteMovie(Long): void
+    +getTop5WatchedMovies(): List<Object[]>
+}
+
+class WatchHistoryService {
+    -WatchHistoryRepository watchHistoryRepository
+    -MovieService movieService
+    --
+    +saveWatchHistory(WatchHistory): WatchHistory
+    +getWatchHistoryByUser(Long): List<WatchHistory>
+    +getWatchHistoryByMovie(Long): List<WatchHistory>
+    +getTopWatchedMovies(): List<Object[]>
+}
+
+class RecommendationService {
+    -WatchHistoryService watchHistoryService
+    -MovieService movieService
+    --
+    +getRecommendedMovies(Long): List<Movie>
+}
+
+class UserDetailsServiceImpl {
+    -UserRepository userRepository
+    --
+    +loadUserByUsername(String): UserDetails
+}
+
+' ===============================
+' REPOSITORY INTERFACES
+' ===============================
+
+interface UserRepository {
+    +findByEmail(String): User
+    +findAll(): List<User>
+    +findById(Long): Optional<User>
+    +save(User): User
+    +deleteById(Long): void
+}
+
+interface MovieRepository {
+    +findAll(): List<Movie>
+    +findById(Long): Optional<Movie>
+    +findByGenre(String): List<Movie>
+    +findTopRatedMovies(): List<Movie>
+    +save(Movie): Movie
+    +deleteById(Long): void
+}
+
+interface WatchHistoryRepository {
+    +findByUserUserId(Long): List<WatchHistory>
+    +findByMovieMovieId(Long): List<WatchHistory>
+    +findTopWatchedMovies(): List<Object[]>
+    +save(WatchHistory): WatchHistory
+    +findAll(): List<WatchHistory>
+    +findById(Long): Optional<WatchHistory>
+    +deleteById(Long): void
+}
+
+' ===============================
+' CONFIGURATION CLASSES
+' ===============================
+
+class SecurityConfig {
+    --
+    +passwordEncoder(): PasswordEncoder
+    +filterChain(HttpSecurity): SecurityFilterChain
+}
+
+class NetflixTrackerApplication {
+    --
+    +main(String[]): void
+}
+
+class DataInitializer {
+    -UserService userService
+    -MovieService movieService
+    --
+    +run(String...): void
+}
+
+' ===============================
+' RELATIONSHIPS
+' ===============================
+
+' Entity Relationships
+User ||--o{ WatchHistory : "has many"
+Movie ||--o{ WatchHistory : "watched by"
+
+' Controller Dependencies
+AuthController --> UserService
+AuthController --> WatchHistoryService
+AuthController --> RecommendationService
+AdminController --> MovieService
+MovieController --> MovieService
+UserController --> UserService
+WatchHistoryController --> WatchHistoryService
+DashboardController --> MovieService
+DashboardController --> WatchHistoryService
+WatchController --> MovieService
+WatchController --> UserService
+WatchController --> WatchHistoryService
+
+' Service Dependencies
+UserService --> UserRepository
+MovieService --> MovieRepository
+MovieService --> WatchHistoryRepository
+WatchHistoryService --> WatchHistoryRepository
+WatchHistoryService --> MovieService
+RecommendationService --> WatchHistoryService
+RecommendationService --> MovieService
+UserDetailsServiceImpl --> UserRepository
+
+' Repository Inheritance
+UserRepository --|> JpaRepository
+MovieRepository --|> JpaRepository
+WatchHistoryRepository --|> JpaRepository
+
+' Configuration Dependencies
+DataInitializer --> UserService
+DataInitializer --> MovieService
+
+' Spring Security Integration
+UserDetailsServiceImpl ..|> UserDetailsService
+SecurityConfig --> PasswordEncoder
+
+@enduml
+
+================================================================
+1. COMPLETE CLASS DIAGRAM - NETFLIX MOVIE STREAMING TRACKER
+================================================================
+
+The above class diagram shows the complete architecture of your Netflix Movie Streaming Tracker project including:
+
+**Entity Classes (Model Layer):**
+- User: Represents system users with authentication and profile information
+- Movie: Represents movies/shows with metadata and ratings
+- WatchHistory: Junction entity linking users to movies with ratings and timestamps
+
+**Controller Classes (Presentation Layer):**
+- AuthController: Handles authentication, registration, and user dashboard
+- AdminController: Manages movie CRUD operations for administrators
+- MovieController, UserController, WatchHistoryController: RESTful endpoints
+- DashboardController, WatchController: UI-specific controllers
+
+**Service Classes (Business Logic Layer):**
+- UserService: User management and authentication logic
+- MovieService: Movie operations and rating calculations
+- WatchHistoryService: Watch tracking and statistics
+- RecommendationService: AI-based movie recommendations
+- UserDetailsServiceImpl: Spring Security integration
+
+**Repository Interfaces (Data Access Layer):**
+- UserRepository, MovieRepository, WatchHistoryRepository: JPA data access
+
+**Configuration Classes:**
+- SecurityConfig: Spring Security configuration
+- DataInitializer: Database seeding
+- NetflixTrackerApplication: Main Spring Boot application
+
+**Key Relationships:**
+- One-to-Many: User → WatchHistory, Movie → WatchHistory
+- Dependency Injection: Controllers → Services → Repositories
+- Interface Implementation: Repositories extend JpaRepository
+
+================================================================
+2. USE CASE DIAGRAM
+================================================================
+
+@startuml
+!theme plain
+
+left to right direction
+
+actor "User" as user
+actor "Admin" as admin
+
+rectangle "Netflix Movie Streaming Tracker" {
+    usecase "Register Account" as UC1
+    usecase "Login" as UC2
+    usecase "Browse Movies" as UC3
+    usecase "Search Movies" as UC4
+    usecase "Rate Movie" as UC5
+    usecase "View Watch History" as UC6
+    usecase "Get Recommendations" as UC7
+    usecase "Update Profile" as UC8
+    usecase "Add Movie" as UC9
+    usecase "Edit Movie" as UC10
+    usecase "Delete Movie" as UC11
+    usecase "Manage Users" as UC12
+}
+
+user --> UC1
+user --> UC2
+user --> UC3
+user --> UC4
+user --> UC5
+user --> UC6
+user --> UC7
+user --> UC8
+
+admin --> UC2
+admin --> UC3
+admin --> UC4
+admin --> UC9
+admin --> UC10
+admin --> UC11
+admin --> UC12
+
+UC5 ..> UC6 : extends
+UC7 ..> UC6 : extends
+
+@enduml
+
+================================================================
+3. SEQUENCE DIAGRAM - USER LOGIN
+================================================================
+
+@startuml
+!theme plain
+
+participant "User" as U
+participant "AuthController" as AC
+participant "UserService" as US
+participant "UserRepository" as UR
+participant "Database" as DB
+
+U -> AC: POST /login (email, password)
+activate AC
+
+AC -> US: authenticateUser(email, password)
+activate US
+
+US -> UR: findByEmail(email)
+activate UR
+
+UR -> DB: SELECT * FROM users WHERE email = ?
+activate DB
+DB --> UR: User data
+deactivate DB
+
+UR --> US: User object
+deactivate UR
+
+US -> US: validatePassword(password, user.password)
+US --> AC: Authentication result
+deactivate US
+
+AC -> AC: createSession()
+AC --> U: Redirect to dashboard
+deactivate AC
+
+@enduml
+
+================================================================
+4. SEQUENCE DIAGRAM - GET RECOMMENDATIONS
+================================================================
+
+@startuml
+!theme plain
+
+participant "User" as U
+participant "RecommendationService" as RS
+participant "WatchHistoryService" as WHS
+participant "MovieService" as MS
+participant "Database" as DB
+
+U -> RS: getRecommendedMovies(userId)
+activate RS
+
+RS -> WHS: getWatchHistoryByUser(userId)
+activate WHS
+
+WHS -> DB: SELECT * FROM watch_history WHERE user_id = ?
+activate DB
+DB --> WHS: Watch history records
+deactivate DB
+
+WHS --> RS: List<WatchHistory>
+deactivate WHS
+
+RS -> RS: analyzeGenrePreferences(watchHistory)
+RS -> MS: findMoviesByGenres(favoriteGenres)
+activate MS
+
+MS -> DB: SELECT * FROM movies WHERE genre IN (?)
+activate DB
+DB --> MS: Movie records
+deactivate DB
+
+MS --> RS: List<Movie>
+deactivate MS
+
+RS -> RS: filterUnwatchedMovies(movies, watchedMovieIds)
+RS --> U: List<Movie> recommendations
+deactivate RS
+
+@enduml
+
+================================================================
+5. ACTIVITY DIAGRAM - USER REGISTRATION
+================================================================
+
+@startuml
+!theme plain
+
+start
+
+:User enters registration details;
+:Validate email format;
+
+if (Email valid?) then (yes)
+    :Check if email exists;
+    if (Email exists?) then (yes)
+        :Display "Email already registered";
+        stop
+    else (no)
+        :Validate password strength;
+        if (Password valid?) then (yes)
+            :Encrypt password;
+            :Save user to database;
+            :Send confirmation email;
+            :Display success message;
+            :Redirect to login page;
+        else (no)
+            :Display password requirements;
+            stop
+        endif
+    endif
+else (no)
+    :Display "Invalid email format";
+    stop
+endif
+
+stop
+
+@enduml
+
+================================================================
+6. COMPONENT DIAGRAM
+================================================================
+
+@startuml
+!theme plain
+
+package "Presentation Layer" {
+    [Thymeleaf Templates]
+    [Bootstrap CSS]
+    [JavaScript]
+    [Static Assets]
+}
+
+package "Controller Layer" {
+    [AuthController]
+    [MovieController]
+    [UserController]
+    [WatchHistoryController]
+    [AdminController]
+}
+
+package "Service Layer" {
+    [UserService]
+    [MovieService]
+    [WatchHistoryService]
+    [RecommendationService]
+}
+
+package "Repository Layer" {
+    [UserRepository]
+    [MovieRepository]
+    [WatchHistoryRepository]
+}
+
+package "Security" {
+    [Spring Security]
+    [Authentication]
+    [Authorization]
+}
+
+database "MySQL Database" {
+    [Users Table]
+    [Movies Table]
+    [Watch History Table]
+}
+
+[Thymeleaf Templates] --> [AuthController]
+[Thymeleaf Templates] --> [MovieController]
+[Thymeleaf Templates] --> [UserController]
+[Thymeleaf Templates] --> [WatchHistoryController]
+[Thymeleaf Templates] --> [AdminController]
+
+[AuthController] --> [UserService]
+[MovieController] --> [MovieService]
+[UserController] --> [UserService]
+[WatchHistoryController] --> [WatchHistoryService]
+[AdminController] --> [MovieService]
+
+[UserService] --> [UserRepository]
+[MovieService] --> [MovieRepository]
+[WatchHistoryService] --> [WatchHistoryRepository]
+[RecommendationService] --> [WatchHistoryService]
+[RecommendationService] --> [MovieService]
+
+[UserRepository] --> [Users Table]
+[MovieRepository] --> [Movies Table]
+[WatchHistoryRepository] --> [Watch History Table]
+
+[Spring Security] --> [AuthController]
+[Authentication] --> [UserService]
+[Authorization] --> [AdminController]
+
+@enduml
+
+================================================================
+7. DATABASE ER DIAGRAM
+================================================================
+
+@startuml
+!theme plain
+
+entity "users" {
+    * user_id : BIGINT <<PK>>
+    --
+    * name : VARCHAR(50)
+    * email : VARCHAR(100) <<UK>>
+    * password : VARCHAR(255)
+    subscription_type : VARCHAR(30)
+    role : VARCHAR(20)
+    join_date : DATETIME
+}
+
+entity "movies" {
+    * movie_id : BIGINT <<PK>>
+    --
+    * title : VARCHAR(100)
+    genre : VARCHAR(50)
+    release_year : INT
+    duration : INT
+    rating_avg : FLOAT
+    content_type : VARCHAR(30)
+    image_url : VARCHAR(255)
+    trailer_url : VARCHAR(255)
+    created_at : DATETIME
+}
+
+entity "watch_history" {
+    * watch_id : BIGINT <<PK>>
+    --
+    * user_id : BIGINT <<FK>>
+    * movie_id : BIGINT <<FK>>
+    * rating : INT
+    watch_date : DATETIME
+}
+
+users ||--o{ watch_history : "has many"
+movies ||--o{ watch_history : "watched by"
+
+@enduml
+
+================================================================
+8. STATE DIAGRAM - USER SESSION
+================================================================
+
+@startuml
+!theme plain
+
+[*] --> Anonymous
+
+Anonymous --> Authenticating : login attempt
+Authenticating --> Authenticated : valid credentials
+Authenticating --> Anonymous : invalid credentials
+
+Authenticated --> Authorized : role verification
+Authorized --> Browsing : access movies
+Browsing --> Watching : select movie
+Watching --> Rating : rate movie
+Rating --> Browsing : continue browsing
+
+Authorized --> AdminPanel : admin access
+AdminPanel --> ManagingContent : manage movies
+ManagingContent --> AdminPanel : save changes
+
+Authenticated --> [*] : logout
+Authorized --> [*] : session timeout
+
+@enduml
+
+================================================================
+
+Instructions:
+1. Copy each diagram code section (between @startuml and @enduml)
+2. Paste into https://plantuml.com/plantuml
+3. Click "Submit" to generate the diagram
+4. Download as PNG/SVG for your report
+
+================================================================
+
+

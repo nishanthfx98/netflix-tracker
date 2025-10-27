@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Netflix - My Watch History</title>
+    <link rel="stylesheet" href="/css/netflix.css">
+</head>
+<body class="dashboard-body">
+    <nav class="dashboard-nav">
+        <div class="nav-left">
+            <h1>NETFLIX</h1>
+            <ul>
+                <li><a href="/dashboard">Home</a></li>
+                <li><a href="/my-history" class="active">My History</a></li>
+                <li sec:authorize="hasRole('ADMIN')"><a href="/admin/movies">Manage Movies</a></li>
+            </ul>
+        </div>
+        <div class="nav-right">
+            <span sec:authentication="name"></span>
+            <a href="/logout">Sign Out</a>
+        </div>
+    </nav>
+    
+    <div class="dashboard-content">
+        <div class="admin-header">
+            <h1>My Watch History</h1>
+        </div>
+        
+        <div class="history-grid">
+            <div th:each="history : ${watchHistory}" class="history-card">
+                <div class="movie-info">
+                    <h3 th:text="${history.movie.title}"></h3>
+                    <p th:text="${history.movie.genre} + ' • ' + ${history.movie.releaseYear}"></p>
+                    <p th:text="${history.movie.duration} + ' min'"></p>
+                </div>
+                <div class="watch-info">
+                    <div class="rating">
+                        <span>My Rating: </span>
+                        <div class="stars">
+                            <span th:each="i : ${#numbers.sequence(1, 5)}" 
+                                  th:class="${i <= history.rating} ? 'star filled' : 'star'">★</span>
+                        </div>
+                    </div>
+                    <p class="watch-date" th:text="'Watched on: ' + ${#temporals.format(history.watchDate, 'MMM dd, yyyy')}"></p>
+                </div>
+            </div>
+        </div>
+        
+        <div th:if="${#lists.isEmpty(watchHistory)}" class="empty-state">
+            <h2>No movies watched yet</h2>
+            <p>Start watching movies to see your history here!</p>
+            <a href="/dashboard" class="btn-get-started">Browse Movies</a>
+        </div>
+    </div>
+</body>
+</html>

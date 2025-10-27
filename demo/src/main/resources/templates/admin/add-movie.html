@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Netflix - Add Movie</title>
+    <link rel="stylesheet" href="/css/netflix.css">
+</head>
+<body class="dashboard-body">
+    <nav class="dashboard-nav">
+        <div class="nav-left">
+            <h1>NETFLIX</h1>
+            <ul>
+                <li><a href="/dashboard">Home</a></li>
+                <li><a href="/admin/movies">Manage Movies</a></li>
+            </ul>
+        </div>
+        <div class="nav-right">
+            <a href="/logout">Sign Out</a>
+        </div>
+    </nav>
+    
+    <div class="admin-content">
+        <div class="admin-form">
+            <h1>Add New Movie</h1>
+            
+            <form th:action="@{/admin/movies/add}" method="post">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label>Genre</label>
+                    <input type="text" name="genre" required>
+                </div>
+                <div class="form-group">
+                    <label>Release Year</label>
+                    <input type="number" name="releaseYear" required>
+                </div>
+                <div class="form-group">
+                    <label>Duration (minutes)</label>
+                    <input type="number" name="duration" required>
+                </div>
+                <div class="form-group">
+                    <label>Content Type</label>
+                    <select name="contentType" required>
+                        <option value="Movie">Movie</option>
+                        <option value="Series">Series</option>
+                        <option value="Documentary">Documentary</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-submit">Add Movie</button>
+                <a href="/admin/movies" class="btn-cancel">Cancel</a>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

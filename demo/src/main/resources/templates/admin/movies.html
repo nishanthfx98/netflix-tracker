@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Netflix - Manage Movies</title>
+    <link rel="stylesheet" href="/css/netflix.css">
+</head>
+<body class="dashboard-body">
+    <nav class="dashboard-nav">
+        <div class="nav-left">
+            <h1>NETFLIX</h1>
+            <ul>
+                <li><a href="/dashboard">Home</a></li>
+                <li><a href="/admin/movies" class="active">Manage Movies</a></li>
+            </ul>
+        </div>
+        <div class="nav-right">
+            <a href="/logout">Sign Out</a>
+        </div>
+    </nav>
+    
+    <div class="admin-content">
+        <div class="admin-header">
+            <h1>Manage Movies</h1>
+            <a href="/admin/movies/add" class="btn-add">Add New Movie</a>
+        </div>
+        
+        <div class="movies-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Genre</th>
+                        <th>Year</th>
+                        <th>Duration</th>
+                        <th>Rating</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="movie : ${movies}">
+                        <td th:text="${movie.title}"></td>
+                        <td th:text="${movie.genre}"></td>
+                        <td th:text="${movie.releaseYear}"></td>
+                        <td th:text="${movie.duration} + ' min'"></td>
+                        <td th:text="${movie.ratingAvg}"></td>
+                        <td>
+                            <a th:href="@{/admin/movies/edit/{id}(id=${movie.movieId})}" class="btn-edit">Edit</a>
+                            <form th:action="@{/admin/movies/delete/{id}(id=${movie.movieId})}" method="post" style="display:inline;">
+                                <button type="submit" class="btn-delete" onclick="return confirm('Delete this movie?')">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Netflix - Dashboard</title>
+    <link rel="stylesheet" href="/css/netflix.css">
+</head>
+<body class="dashboard-body">
+    <nav class="dashboard-nav">
+        <div class="nav-left">
+            <h1>NETFLIX</h1>
+            <ul>
+                <li><a href="/dashboard">Home</a></li>
+                <li><a href="/my-history">My History</a></li>
+                <li><a href="/recommendations">Recommended</a></li>
+                <li sec:authorize="hasRole('ADMIN')"><a href="/admin/movies">Manage Movies</a></li>
+            </ul>
+        </div>
+        <div class="nav-right">
+            <span sec:authentication="name"></span>
+            <a href="/logout">Sign Out</a>
+        </div>
+    </nav>
+    
+    <div class="dashboard-content">
+        <div class="hero-banner">
+            <h1>Welcome to Netflix</h1>
+            <p>Discover your next favorite movie or TV show</p>
+        </div>
+        
+        <div class="movie-sections">
+            <div class="movie-row">
+                <h2>Popular Movies</h2>
+                <div class="movie-grid" id="movieGrid">
+                    <!-- Movies will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        fetch('/api/movies')
+            .then(response => response.json())
+            .then(movies => {
+                const grid = document.getElementById('movieGrid');
+                movies.forEach(movie => {
+                    const movieCard = document.createElement('div');
+                    movieCard.className = 'movie-card';
+                    movieCard.innerHTML = `
+                        <img src="${movie.imageUrl}" alt="${movie.title}" onerror="this.src='/assets/default.jpg'">
+                        <div class="movie-info">
+                            <h3>${movie.title}</h3>
+                            <p>${movie.genre} • ${movie.releaseYear}</p>
+                            <p>Rating: ${movie.ratingAvg || 'N/A'}</p>
+                            <button onclick="watchMovie(${movie.movieId})">Watch Now</button>
+                        </div>
+                    `;
+                    grid.appendChild(movieCard);
+                });
+            });
+            
+        function watchMovie(movieId) {
+            window.location.href = '/watch/' + movieId;
+        }
+    </script>
+</body>
+</html>

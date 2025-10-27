@@ -1,0 +1,5 @@
+Test accounts:
+
+Admin: admin@netflix.com / admin123
+
+User: john@example.com / password   

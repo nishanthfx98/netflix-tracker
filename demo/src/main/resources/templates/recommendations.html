@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Netflix - Recommended for You</title>
+    <link rel="stylesheet" href="/css/netflix.css">
+</head>
+<body class="dashboard-body">
+    <nav class="dashboard-nav">
+        <div class="nav-left">
+            <h1>NETFLIX</h1>
+            <ul>
+                <li><a href="/dashboard">Home</a></li>
+                <li><a href="/my-history">My History</a></li>
+                <li><a href="/recommendations" class="active">Recommended</a></li>
+                <li sec:authorize="hasRole('ADMIN')"><a href="/admin/movies">Manage Movies</a></li>
+            </ul>
+        </div>
+        <div class="nav-right">
+            <span sec:authentication="name"></span>
+            <a href="/logout">Sign Out</a>
+        </div>
+    </nav>
+    
+    <div class="dashboard-content">
+        <div class="hero-banner">
+            <h1>Recommended for You</h1>
+            <p>Based on your viewing history and ratings</p>
+        </div>
+        
+        <div class="movie-sections">
+            <div class="movie-row">
+                <div class="movie-grid">
+                    <div th:each="movie : ${recommendations}" class="movie-card">
+                        <img th:src="${movie.imageUrl}" th:alt="${movie.title}" onerror="this.src='/assets/default.jpg'">
+                        <div class="movie-info">
+                            <h3 th:text="${movie.title}"></h3>
+                            <p th:text="${movie.genre} + ' • ' + ${movie.releaseYear}"></p>
+                            <p th:text="${movie.duration} + ' min'"></p>
+                            <p>Rating: <span th:text="${movie.ratingAvg ?: 'N/A'}"></span></p>
+                            <button onclick="watchMovie(${movie.movieId})">Watch Now</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div th:if="${#lists.isEmpty(recommendations)}" class="empty-state">
+            <h2>No recommendations yet</h2>
+            <p>Watch and rate some movies to get personalized recommendations!</p>
+            <a href="/dashboard" class="btn-get-started">Browse Movies</a>
+        </div>
+    </div>
+    
+    <script>
+        function watchMovie(movieId) {
+            window.location.href = '/watch/' + movieId;
+        }
+    </script>
+</body>
+</html>
